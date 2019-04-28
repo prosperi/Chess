@@ -7,6 +7,7 @@ data Cell = Empty
           | King {symbol :: String}
           deriving (Show)
 
+create :: [[Cell]]
 create = (base "W")
         : (take 8 $ repeat Pawn {symbol = "PW"})
         : (take 6 $ repeat (take 8 $ repeat Empty))
@@ -37,7 +38,7 @@ draw board = putStr
             $ foldl1 (++)
             $ map (\r -> (
                 foldl1 (++)
-                $ map (++ "    ")
+                $ map (\v -> "  " ++ v ++ "  ")
                 $ map printer r
               )
               ++ "\n"
