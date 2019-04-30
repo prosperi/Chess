@@ -1,47 +1,105 @@
-data Cell = Empty
-          | Pawn {symbol :: String}
-          | Rook {symbol :: String}
-          | Knight {symbol :: String}
-          | Bishop {symbol :: String}
-          | Queen {symbol :: String}
-          | King {symbol :: String}
-          deriving (Show)
+-- ▒░
+data Piece = Empty {color :: String}
+          | Pawn {color :: String}
+          | Rook {color :: String}
+          | Knight {color :: String}
+          | Bishop {color :: String}
+          | Queen {color :: String}
+          | King {color :: String}
+          deriving (Show, Eq)
 
-create :: [[Cell]]
-create = (base "W")
-        : (take 8 $ repeat Pawn {symbol = "PW"})
-        : (take 6 $ repeat (take 8 $ repeat Empty))
-        ++ (take 8 $ repeat Pawn {symbol = "PB"})
-        : (reverse (base "B"))
+create :: [[Piece]]
+create = base "W"
+        : pawns "W"
+        : empty
+        : reverse empty
+        : empty
+        : reverse empty
+        : pawns "B"
+        : base "B"
         : []
-        where base c = Rook {symbol = "R" ++ c}
-                    :Knight {symbol = "K" ++ c}
-                    :Bishop {symbol = "B" ++ c}
-                    :Queen {symbol = "Q" ++ c}
-                    :King {symbol = "K" ++ c}
-                    :Bishop {symbol = "B" ++ c}
-                    :Knight {symbol = "K" ++ c}
-                    :Rook {symbol = "R" ++ c}
-                    :[]
+        where empty = foldl1 (++) (take 4 $ repeat [Empty {color = "B"}, Empty {color = "W"}])
+              pawns c = take 8 $ repeat Pawn {color = c}
+              base c = Rook {color = c}
+                      : Knight {color = c}
+                      : Bishop {color = c}
+                      : Queen {color = c}
+                      : King {color = c}
+                      : Bishop {color = c}
+                      : Knight {color = c}
+                      : Rook {color = c}
+                      : []
 
-printer :: Cell -> String
-printer Empty = "__"
-printer (Pawn {symbol = c}) = c
-printer (Rook {symbol = c}) = c
-printer (Knight {symbol = c}) = c
-printer (Bishop {symbol = c}) = c
-printer (Queen {symbol = c}) = c
-printer (King {symbol = c}) = c
+move :: [[Piece]] -> (Int, Int) -> (Int, Int) -> [[Piece]]
+move board (x0, y0) (x1, y1) = map
+  (\r ->
+    map
+      (\v ->
+        if (fst v) == y0 && (fst r) == x0 then
+          if (x0 + y0) `mod` 2 == 0 then Empty {color = "B"}
+          else Empty {color = "W"}
+        else if (fst v) == y1 && (fst r) == x1 then (board !! x0 !! y0)
+        else (snd v)
+      )
+      (zip [0..] (snd r))
+  )
+  $ zip [0..] board
 
-draw :: [[Cell]] -> IO ()
-draw board = putStr
-            $ foldl1 (++)
-            $ map (\r -> (
-                foldl1 (++)
-                $ map (\v -> "  " ++ v ++ "  ")
-                $ map printer r
-              )
-              ++ "\n"
-              ++ (foldl1 (++) $ take (8 * 6) $ repeat " ")
-              ++ "\n"
-            ) board
+draw :: [[Piece]] -> String
+draw board = foldl1 (++)
+  $ (++ ["   0  1  2  3  4  5  6  7\n"])
+  $ map (\(index, row) ->
+    show index
+    ++ " "
+    ++ (
+      foldl1 (++)
+      $ map (\v -> " " ++ v ++ " ")
+      $ map format row
+    )
+    ++ "\n"
+    ++ (foldl1 (++) $ take (8 * 3) $ repeat " ")
+    ++ "\n"
+  )
+  $ zip [7, 6..]
+  $ rotate board
+
+rotate :: [[Piece]] -> [[Piece]]
+rotate = reverse
+
+format :: Piece -> String
+format (Empty {color = c})
+  | c == "B" = "▓"
+  | c == "W" = "░"
+format (Pawn {color = c})
+  | c == "B" = "♟"
+  | c == "W" = "♙"
+format (Rook {color = c})
+  | c == "B" = "♜"
+  | c == "W" = "♖"
+format (Knight {color = c})
+  | c == "B" = "♞"
+  | c == "W" = "♘"
+format (Bishop {color = c})
+  | c == "B" = "♝"
+  | c == "W" = "♗"
+format (Queen {color = c})
+  | c == "B" = "♛"
+  | c == "W" = "♕"
+format (King {color = c})
+  | c == "B" = "♚"
+  | c == "W" = "♔"
+
+
+play :: [[Piece]] -> IO ()
+play board = do
+  putStr $ draw $ board
+  putStr "\n(r0, c0):"
+  initial <- getLine
+  putStr "(r1, c1):"
+  final <- getLine
+  putStr "\n"
+  play $ move board (read initial :: (Int, Int)) (read final :: (Int, Int))
+
+main = do play $ create
+
+
