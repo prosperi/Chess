@@ -1,4 +1,3 @@
--- ▒░
 data Piece = Empty {color :: String}
           | Pawn {color :: String}
           | Rook {color :: String}
