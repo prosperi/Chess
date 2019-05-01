@@ -71,8 +71,10 @@ rotate = reverse
 
 validate :: Piece -> (Int, Int) -> (Int, Int) -> [[Piece]] -> Bool
 validate (Empty {color = c}) (x0, y0) (x1, y1) board = False
-validate (Pawn {color = c}) (x0, y0) (x1, y1) board = False
-validate (Rook {color = c}) (x0, y0) (x1, y1) board = True
+validate (Pawn {color = c}) (x0, y0) (x1, y1) board = True
+validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
+  then True
+  else False
 validate (Knight {color = c}) (x0, y0) (x1, y1) board = True
 validate (Bishop {color = c}) (x0, y0) (x1, y1) board = True
 validate (Queen {color = c}) (x0, y0) (x1, y1) board = True
