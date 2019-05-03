@@ -48,7 +48,11 @@ move board (x0, y0) (x1, y1) = if (validate (board !! x0 !! y0) (x0, y0) (x1, y1
     board
 
 getCell :: [[Piece]] -> (Int, Int) -> String
-getCell board (x, y) = color (board !! x !! y)
+getCell board (x, y) = getColor(board !! x !! y)
+
+getColor :: Piece -> String
+getColor (Empty {color = c}) = "Empty"
+getColor piece = color piece
 
 draw :: [[Piece]] -> String
 draw board = foldl1 (++)
