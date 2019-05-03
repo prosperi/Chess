@@ -30,19 +30,23 @@ create = base "W"
                       : []
 
 move :: [[Piece]] -> (Int, Int) -> (Int, Int) -> [[Piece]]
-move board (x0, y0) (x1, y1) = map
-  (\r ->
-    map
-      (\v ->
-        if (fst v) == y0 && (fst r) == x0 then
-          if (x0 + y0) `mod` 2 == 0 then Empty {color = "B"}
-          else Empty {color = "W"}
-        else if (fst v) == y1 && (fst r) == x1 then (board !! x0 !! y0)
-        else (snd v)
-      )
-      (zip [0..] (snd r))
-  )
-  $ zip [0..] board
+move board (x0, y0) (x1, y1) = if (validate (board !! x0 !! y0) (x0, y0) (x1, y1) board)
+  then
+    map (\r ->
+      map
+        (\v ->
+          if (fst v) == y0 && (fst r) == x0 then
+            if (x0 + y0) `mod` 2 == 0 then Empty {color = "B"}
+            else Empty {color = "W"}
+          else if (fst v) == y1 && (fst r) == x1 then (board !! x0 !! y0)
+          else (snd v)
+        )
+        (zip [0..] (snd r))
+    )
+    $ zip [0..] board
+  else
+    board
+
 
 draw :: [[Piece]] -> String
 draw board = foldl1 (++)
@@ -64,6 +68,17 @@ draw board = foldl1 (++)
 
 rotate :: [[Piece]] -> [[Piece]]
 rotate = reverse
+
+validate :: Piece -> (Int, Int) -> (Int, Int) -> [[Piece]] -> Bool
+validate (Empty {color = c}) (x0, y0) (x1, y1) board = False
+validate (Pawn {color = c}) (x0, y0) (x1, y1) board = True
+validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
+  then True
+  else False
+validate (Knight {color = c}) (x0, y0) (x1, y1) board = True
+validate (Bishop {color = c}) (x0, y0) (x1, y1) board = True
+validate (Queen {color = c}) (x0, y0) (x1, y1) board = True
+validate (King {color = c}) (x0, y0) (x1, y1) board = True
 
 format :: Piece -> String
 format (Empty {color = c})
