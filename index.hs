@@ -118,7 +118,9 @@ validate (Knight {color = c}) (x0, y0) (x1, y1) board =
   else False --invalide move for knight
 validate (Bishop {color = c}) (x0, y0) (x1, y1) board = True
 validate (Queen {color = c}) (x0, y0) (x1, y1) board = True
-validate (King {color = c}) (x0, y0) (x1, y1) board = True
+validate (King {color = c}) (x0, y0) (x1, y1) board =
+    if (((abs (x0 - x1)) < 2) && ((abs (y0 - y1)) < 2)) then if ((getCell board (x1, y1)) /= c) then True else False
+    else False
 
 format :: Piece -> String
 format (Empty {color = c})
