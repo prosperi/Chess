@@ -47,6 +47,17 @@ move board (x0, y0) (x1, y1) = if (validate (board !! x0 !! y0) (x0, y0) (x1, y1
   else
     board
 
+getCell :: [[Piece]] -> (Int, Int) -> String
+getCell board (x, y) = getColor(board !! x !! y)
+
+getColor :: Piece -> String
+getColor (Empty {color = c}) = "Empty"
+getColor (Pawn {color = c}) = c
+getColor (Rook {color = c}) = c
+getColor (Knight {color = c}) = c
+getColor (Bishop {color = c}) = c
+getColor (Queen {color = c}) = c
+getColor (King {color = c}) = c
 
 draw :: [[Piece]] -> String
 draw board = foldl1 (++)
@@ -115,5 +126,3 @@ play board = do
   play $ move board (read initial :: (Int, Int)) (read final :: (Int, Int))
 
 main = do play $ create
-
-
