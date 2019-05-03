@@ -48,7 +48,7 @@ move board (x0, y0) (x1, y1) = if (validate (board !! x0 !! y0) (x0, y0) (x1, y1
     board
 
 getCell :: [[Piece]] -> (Int, Int) -> String
-getCell board (x, y) = color (board !! x !! y)g
+getCell board (x, y) = color (board !! x !! y)
 
 draw :: [[Piece]] -> String
 draw board = foldl1 (++)
@@ -74,9 +74,9 @@ rotate = reverse
 validate :: Piece -> (Int, Int) -> (Int, Int) -> [[Piece]] -> Bool
 validate (Empty {color = c}) (x0, y0) (x1, y1) board = False
 -- check pawn move
-validate (Pawn {color = c}) (x0, y0) (x1, y1) board = 
+validate (Pawn {color = c}) (x0, y0) (x1, y1) board =
   -- if pawn is White
-  if ((getCell board (x0, y0)) == "W") 
+  if ((getCell board (x0, y0)) == "W")
     --check for double move case
     then if (x0 == 1 && y0 == y1 && x1 == 3) then if ((getCell board (x1, y1)) /= c && (getCell board (2, y1)) /= c) then True else False
     -- move forward one space
@@ -101,7 +101,7 @@ validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) 
   then True
   else False
   -- check knight move
-validate (Knight {color = c}) (x0, y0) (x1, y1) board = 
+validate (Knight {color = c}) (x0, y0) (x1, y1) board =
   --checks each of the eight possible moves for a knight
   if (x0 == (x1 + 2) && y0 == (y1 + 1)) then if ((getCell board (x1, y1)) /= c) then True else False
   else if (x0 == (x1 + 2) && y0 == (y1 - 1)) then if ((getCell board (x1, y1)) /= c) then True else False
