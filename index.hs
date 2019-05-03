@@ -82,11 +82,45 @@ rotate = reverse
 
 validate :: Piece -> (Int, Int) -> (Int, Int) -> [[Piece]] -> Bool
 validate (Empty {color = c}) (x0, y0) (x1, y1) board = False
-validate (Pawn {color = c}) (x0, y0) (x1, y1) board = True
+-- check pawn move
+validate (Pawn {color = c}) (x0, y0) (x1, y1) board = 
+  -- if pawn is White
+  if ((getCell board (x0, y0)) == "W") 
+    --check for double move case
+    then if (x0 == 1 && y0 == y1 && x1 == 3) then if ((getCell board (x1, y1)) /= c && (getCell board (2, y1)) /= c) then True else False
+    -- move forward one space
+    else if (x0 == (x1 - 1) && y0 == y1) then if ((getCell board (x1, y1)) == "Empty") then True else False
+    -- take the diagonal enemy piece
+    else if (x0 == (x1 - 1) && y0 == (y1 - 1)) then if ((getCell board (x1, y1)) == "B") then True else False
+    else if (x0 == (x1 - 1) && y0 == (y1 + 1)) then if ((getCell board (x1, y1)) == "B") then True else False
+    else False --invalid move by White
+  -- if pawn is Black
+  else if ((getCell board (x0, y0)) == "B")
+    -- check for double move case
+    then if (x0 == 6 && y0 == y1 && x1 == 4) then if ((getCell board (x1, y1)) /=c && (getCell board (5, y1)) /= c) then True else False
+    -- move forward one space
+    else if (x0 == (x1 + 1) && y0 == y1) then if ((getCell board (x1, y1)) == "Empty") then True else False
+    -- take the diagonal enemy piece
+    else if (x0 == (x1 + 1) && y0 == (y1 - 1)) then if ((getCell board (x1, y1)) == "W") then True else False
+    else if (x0 == (x1 + 1) && y0 == (y1 + 1)) then if ((getCell board (x1, y1)) == "W") then True else False
+    else False --invalid move by Black
+  -- backup fail state, should never be reached
+  else False
 validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
   then True
   else False
-validate (Knight {color = c}) (x0, y0) (x1, y1) board = True
+  -- check knight move
+validate (Knight {color = c}) (x0, y0) (x1, y1) board = 
+  --checks each of the eight possible moves for a knight
+  if (x0 == (x1 + 2) && y0 == (y1 + 1)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 + 2) && y0 == (y1 - 1)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 - 2) && y0 == (y1 + 1))  then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 - 2) && y0 == (y1 - 1)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 + 1) && y0 == (y1 + 2)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 + 1) && y0 == (y1 - 2)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 - 1) && y0 == (y1 + 2)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else if (x0 == (x1 - 1) && y0 == (y1 - 2)) then if ((getCell board (x1, y1)) /= c) then True else False
+  else False --invalide move for knight
 validate (Bishop {color = c}) (x0, y0) (x1, y1) board = True
 validate (Queen {color = c}) (x0, y0) (x1, y1) board = True
 validate (King {color = c}) (x0, y0) (x1, y1) board = True
