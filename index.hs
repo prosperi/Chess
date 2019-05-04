@@ -102,7 +102,7 @@ validate (Pawn {color = c}) (x0, y0) (x1, y1) board =
   -- backup fail state, should never be reached
   else False
 validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
-  then True
+  then if ((getCell board (x1, y1)) /= c) then isPathClearLinear board (x0, y0) (x1, y1) else False
   else False
   -- check knight move
 validate (Knight {color = c}) (x0, y0) (x1, y1) board =
@@ -116,11 +116,40 @@ validate (Knight {color = c}) (x0, y0) (x1, y1) board =
   else if (x0 == (x1 - 1) && y0 == (y1 + 2)) then if ((getCell board (x1, y1)) /= c) then True else False
   else if (x0 == (x1 - 1) && y0 == (y1 - 2)) then if ((getCell board (x1, y1)) /= c) then True else False
   else False --invalide move for knight
-validate (Bishop {color = c}) (x0, y0) (x1, y1) board = True
-validate (Queen {color = c}) (x0, y0) (x1, y1) board = True
+validate (Bishop {color = c}) (x0, y0) (x1, y1) board =
+    if ((abs (x0 - x1)) == (abs (y0 - y1))) then if ((getCell board (x1, y1)) /= c) then isPathClearDiagonal board (x0, y0) (x1, y1) else False
+    else False
+
+validate (Queen {color = c}) (x0, y0) (x1, y1) board =
+    if ((getCell board (x1, y1)) /= c)
+        then if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1) then isPathClearLinear board (x0, y0) (x1, y1)
+            else if ((abs (x0 - x1)) == (abs (y0 - y1))) then isPathClearDiagonal board (x0, y0) (x1, y1) else False
+
+    else False
+
 validate (King {color = c}) (x0, y0) (x1, y1) board =
     if (((abs (x0 - x1)) < 2) && ((abs (y0 - y1)) < 2)) then if ((getCell board (x1, y1)) /= c) then True else False
     else False
+
+isPathClearLinear :: [[Piece]] -> (Int, Int) -> (Int, Int) -> Bool
+isPathClearLinear board (x0, y0) (x1, y1) =
+    if ((x0 == x1) && (y0 == y1)) then True
+
+    else
+        if(x0 > x1) then if ((getCell board ((x0 - 1), y1)) == "Empty") || (((x0 - 1) == x1) && (y0 == y1)) then isPathClearLinear board (x0-1, y0) (x1, y1) else False
+        else if(x0 < x1) then if ((getCell board ((x1 - 1), y1)) == "Empty") || ((x0 == (x1 - 1)) && (y0 == y1)) then isPathClearLinear board (x0, y0) (x1-1, y1) else False
+        else if(y0 > y1) then if ((getCell board (x1, (y0 - 1))) == "Empty") || ((x0 == x1) && ((y0 - 1) == y1)) then isPathClearLinear board (x0, y0-1) (x1, y1) else False
+        else if ((getCell board (x1, (y1 - 1))) == "Empty") || ((x0 == x1) && (y0 == (y1 - 1))) then isPathClearLinear board (x0, y0) (x1, y1-1) else False
+
+isPathClearDiagonal :: [[Piece]] -> (Int, Int) -> (Int, Int) -> Bool
+isPathClearDiagonal board (x0, y0) (x1, y1) =
+    if ((x0 == x1) && (y0 == y1)) then True
+
+    else
+        if(x0 > x1) && (y0 > y1) then if ((getCell board ((x0 - 1), (y0 - 1))) == "Empty") || (((x0 - 1) == x1) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0 - 1, y0 - 1) (x1, y1) else False
+        else if(x0 > x1) && (y0 < y1) then if ((getCell board ((x0 - 1), (y1 - 1))) == "Empty") || (((x0 - 1) == x1) && (y0 == (y1 - 1))) then isPathClearDiagonal board (x0 - 1, y0) (x1, y1 - 1) else False
+        else if(x0 < x1) && (y0 > y1) then if ((getCell board ((x1 - 1), (y0 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0, y0 - 1) (x1 - 1, y1) else False
+        else if ((getCell board ((x1 - 1), (y1 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y1 - 1) == y0)) then isPathClearDiagonal board (x0, y0) (x1 - 1, y1 - 1) else False
 
 format :: Piece -> String
 format (Empty {color = c})
