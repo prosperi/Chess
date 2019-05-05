@@ -157,7 +157,7 @@ isPathClearDiagonal board (x0, y0) (x1, y1) =
 
 inCheck :: String -> [[Piece]] -> Bool
 inCheck turn board = foldl (\acc (index, piece) -> acc || validate piece (div index 8, mod index 8) (div king 8, mod king 8) board) False (zip [0..] (concat board))
-  where king = fst $ (filter (\(index, cell) -> cell == King {color = "W"}) $ zip [0..] (concat board)) !! 0
+  where king = fst $ (filter (\(index, cell) -> cell == King {color = changeColor turn}) $ zip [0..] (concat board)) !! 0
 
 inCheckMate :: String -> [[Piece]] -> Bool
 inCheckMate turn board =
