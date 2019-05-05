@@ -147,9 +147,9 @@ isPathClearDiagonal board (x0, y0) (x1, y1) =
 
     else
         if(x0 > x1) && (y0 > y1) then if ((getCell board ((x0 - 1), (y0 - 1))) == "Empty") || (((x0 - 1) == x1) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0 - 1, y0 - 1) (x1, y1) else False
-        else if(x0 > x1) && (y0 < y1) then if ((getCell board ((x0 - 1), (y1 - 1))) == "Empty") || (((x0 - 1) == x1) && (y0 == (y1 - 1))) then isPathClearDiagonal board (x0 - 1, y0) (x1, y1 - 1) else False
-        else if(x0 < x1) && (y0 > y1) then if ((getCell board ((x1 - 1), (y0 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0, y0 - 1) (x1 - 1, y1) else False
-        else if ((getCell board ((x1 - 1), (y1 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y1 - 1) == y0)) then isPathClearDiagonal board (x0, y0) (x1 - 1, y1 - 1) else False
+        else if(x0 > x1) && (y0 < y1) then if ((getCell board ((x0 - 1), (y0 + 1))) == "Empty") || (((x0 - 1) == x1) && ((y0 + 1) == y1)) then isPathClearDiagonal board (x0 - 1, y0 + 1) (x1, y1) else False
+        else if(x0 < x1) && (y0 > y1) then if ((getCell board ((x0 + 1), (y0 - 1))) == "Empty") || (((x0 + 1) == x1) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0 + 1, y0 - 1) (x1, y1) else False
+        else if ((getCell board ((x0 + 1), (y0 + 1))) == "Empty") || (((x0 + 1) == x1) && (y1 == (y0 + 1))) then isPathClearDiagonal board (x0 + 1, y0 + 1) (x1, y1) else False
 
 format :: Piece -> String
 format (Empty {color = c})
