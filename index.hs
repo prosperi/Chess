@@ -1,3 +1,5 @@
+import Text.Read
+
 data Piece = Empty {color :: String}
           | Pawn {color :: String}
           | Rook {color :: String}
@@ -198,6 +200,14 @@ format (King {color = c})
   | c == "B" = "♚"
   | c == "W" = "♔"
 
+validateInput :: String -> IO (Int, Int)
+validateInput prompt = do
+  putStr prompt
+  response <- getLine
+  let parsed = readMaybe response :: Maybe (Int, Int)
+  case parsed of
+    Just parsed -> return parsed
+    Nothing -> putStrLn "Invalid input. Please enter your position as (row, column)." >> validateInput prompt
 
 play :: [[Piece]] -> IO ()
 play board = do
@@ -207,11 +217,9 @@ play board = do
     else if inCheck board
       then putStr "\nYou are in check!"
       else putStr "\nPlay wisely!"
-  putStr "\n(r0, c0):"
-  initial <- getLine
-  putStr "(r1, c1):"
-  final <- getLine
+  initial <- validateInput "\n(r0, c0):"
+  final <- validateInput "\n(r1, c1):"
   putStr "\n"
-  play $ move board (read initial :: (Int, Int)) (read final :: (Int, Int))
+  play $ move board initial final
 
 main = do play $ create
