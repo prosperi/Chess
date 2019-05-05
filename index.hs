@@ -209,17 +209,22 @@ validateInput prompt = do
     Just parsed -> return parsed
     Nothing -> putStrLn "Invalid input. Please enter your position as (row, column)." >> validateInput prompt
 
-play :: [[Piece]] -> IO ()
-play board = do
+play :: Int -> [[Piece]] -> IO ()
+play (-1) board = do
+  putStr("\nGood game!\n")
+play step board = do
   putStr $ draw $ board
   if inCheckMate board
-    then putStr "\nYou are finished!"
+    then do
+      putStr "\nYou are finished!"
+      play (-1) board
     else if inCheck board
       then putStr "\nYou are in check!"
-      else putStr "\nPlay wisely!"
-  initial <- validateInput "\n(r0, c0):"
-  final <- validateInput "\n(r1, c1):"
-  putStr "\n"
-  play $ move board initial final
+      else do
+        putStr "\nPlay wisely!"
+        initial <- validateInput "\n(r0, c0):"
+        final <- validateInput "\n(r1, c1):"
+        putStr "\n"
+        play (step + 1) $ move board initial final
 
-main = do play $ create
+main = do play 0 $ create
