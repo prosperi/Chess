@@ -199,19 +199,24 @@ format (King {color = c})
   | c == "W" = "♔"
 
 
-play :: [[Piece]] -> IO ()
-play board = do
+play :: Int -> [[Piece]] -> IO ()
+play (-1) board = do
+  putStr("\nGood game!\n")
+play step board = do
   putStr $ draw $ board
   if inCheckMate board
-    then putStr "\nYou are finished!"
+    then do
+      putStr "\nYou are finished!"
+      play (-1) board
     else if inCheck board
       then putStr "\nYou are in check!"
-      else putStr "\nPlay wisely!"
-  putStr "\n(r0, c0):"
-  initial <- getLine
-  putStr "(r1, c1):"
-  final <- getLine
-  putStr "\n"
-  play $ move board (read initial :: (Int, Int)) (read final :: (Int, Int))
+      else do
+        putStr "\nPlay wisely!"
+        putStr "\n(r0, c0):"
+        initial <- getLine
+        putStr "(r1, c1):"
+        final <- getLine
+        putStr "\n"
+        play (step + 1) $ move board (read initial :: (Int, Int)) (read final :: (Int, Int))
 
-main = do play $ create
+main = do play 0 $ create
