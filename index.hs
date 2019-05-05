@@ -157,7 +157,22 @@ inCheck :: [[Piece]] -> Bool
 inCheck board = foldl (\acc (index, piece) -> acc || validate piece (div index 8, mod index 8) (div king 8, mod king 8) board) False (zip [0..] (concat board))
   where king = fst $ (filter (\(index, cell) -> cell == King {color = "W"}) $ zip [0..] (concat board)) !! 0
 
--- inCheckMate :: [[Piece]] -> Bool
+inCheckMate :: [[Piece]] -> Bool
+inCheckMate board =
+  inCheck board
+  &&
+  foldl
+    (\acc (index, piece) ->
+      acc
+      &&
+      foldl
+        (&&)
+        True
+        (map (\cell -> inCheck $ move board (div index 8, mod index 8) (div cell 8, mod cell 8)) [0,1..63])
+    )
+    True
+    (filter (\(index, piece) -> getColor piece == "W") (zip [0..] (concat board)))
+
 
 
 format :: Piece -> String
@@ -187,9 +202,11 @@ format (King {color = c})
 play :: [[Piece]] -> IO ()
 play board = do
   putStr $ draw $ board
-  if inCheck board
-    then putStr "\nYou are in check!"
-    else putStr "Play wisely!"
+  if inCheckMate board
+    then putStr "\nYou are finished!"
+    else if inCheck board
+      then putStr "\nYou are in check!"
+      else putStr "\nPlay wisely!"
   putStr "\n(r0, c0):"
   initial <- getLine
   putStr "(r1, c1):"
