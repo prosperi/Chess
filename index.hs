@@ -78,6 +78,7 @@ rotate = reverse
 validate :: Piece -> (Int, Int) -> (Int, Int) -> [[Piece]] -> Bool
 validate (Empty {color = c}) (x0, y0) (x1, y1) board = False
 -- check pawn move
+
 validate (Pawn {color = c}) (x0, y0) (x1, y1) board =
   -- if pawn is White
   if ((getCell board (x0, y0)) == "W")
@@ -101,10 +102,13 @@ validate (Pawn {color = c}) (x0, y0) (x1, y1) board =
     else False --invalid move by Black
   -- backup fail state, should never be reached
   else False
-validate (Rook {color = c}) (x0, y0) (x1, y1) board = if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
+
+validate (Rook {color = c}) (x0, y0) (x1, y1) board =
+  if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1)
   then if ((getCell board (x1, y1)) /= c) then isPathClearLinear board (x0, y0) (x1, y1) else False
   else False
   -- check knight move
+
 validate (Knight {color = c}) (x0, y0) (x1, y1) board =
   --checks each of the eight possible moves for a knight
   if (x0 == (x1 + 2) && y0 == (y1 + 1)) then if ((getCell board (x1, y1)) /= c) then True else False
@@ -115,7 +119,8 @@ validate (Knight {color = c}) (x0, y0) (x1, y1) board =
   else if (x0 == (x1 + 1) && y0 == (y1 - 2)) then if ((getCell board (x1, y1)) /= c) then True else False
   else if (x0 == (x1 - 1) && y0 == (y1 + 2)) then if ((getCell board (x1, y1)) /= c) then True else False
   else if (x0 == (x1 - 1) && y0 == (y1 - 2)) then if ((getCell board (x1, y1)) /= c) then True else False
-  else False --invalide move for knight
+  else False --invalid move for knight
+
 validate (Bishop {color = c}) (x0, y0) (x1, y1) board =
     if ((abs (x0 - x1)) == (abs (y0 - y1))) then if ((getCell board (x1, y1)) /= c) then isPathClearDiagonal board (x0, y0) (x1, y1) else False
     else False
@@ -124,7 +129,6 @@ validate (Queen {color = c}) (x0, y0) (x1, y1) board =
     if ((getCell board (x1, y1)) /= c)
         then if (x0 == x1 && y0 /= y1) || (x0 /= x1 && y0 == y1) then isPathClearLinear board (x0, y0) (x1, y1)
             else if ((abs (x0 - x1)) == (abs (y0 - y1))) then isPathClearDiagonal board (x0, y0) (x1, y1) else False
-
     else False
 
 validate (King {color = c}) (x0, y0) (x1, y1) board =
@@ -134,7 +138,6 @@ validate (King {color = c}) (x0, y0) (x1, y1) board =
 isPathClearLinear :: [[Piece]] -> (Int, Int) -> (Int, Int) -> Bool
 isPathClearLinear board (x0, y0) (x1, y1) =
     if ((x0 == x1) && (y0 == y1)) then True
-
     else
         if(x0 > x1) then if ((getCell board ((x0 - 1), y1)) == "Empty") || (((x0 - 1) == x1) && (y0 == y1)) then isPathClearLinear board (x0-1, y0) (x1, y1) else False
         else if(x0 < x1) then if ((getCell board ((x1 - 1), y1)) == "Empty") || ((x0 == (x1 - 1)) && (y0 == y1)) then isPathClearLinear board (x0, y0) (x1-1, y1) else False
@@ -144,12 +147,18 @@ isPathClearLinear board (x0, y0) (x1, y1) =
 isPathClearDiagonal :: [[Piece]] -> (Int, Int) -> (Int, Int) -> Bool
 isPathClearDiagonal board (x0, y0) (x1, y1) =
     if ((x0 == x1) && (y0 == y1)) then True
-
     else
         if(x0 > x1) && (y0 > y1) then if ((getCell board ((x0 - 1), (y0 - 1))) == "Empty") || (((x0 - 1) == x1) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0 - 1, y0 - 1) (x1, y1) else False
         else if(x0 > x1) && (y0 < y1) then if ((getCell board ((x0 - 1), (y1 - 1))) == "Empty") || (((x0 - 1) == x1) && (y0 == (y1 - 1))) then isPathClearDiagonal board (x0 - 1, y0) (x1, y1 - 1) else False
         else if(x0 < x1) && (y0 > y1) then if ((getCell board ((x1 - 1), (y0 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y0 - 1) == y1)) then isPathClearDiagonal board (x0, y0 - 1) (x1 - 1, y1) else False
         else if ((getCell board ((x1 - 1), (y1 - 1))) == "Empty") || ((x0 == (x1 - 1)) && ((y1 - 1) == y0)) then isPathClearDiagonal board (x0, y0) (x1 - 1, y1 - 1) else False
+
+inCheck :: [[Piece]] -> Bool
+inCheck board = foldl (\acc (index, piece) -> acc || validate piece (div index 8, mod index 8) (div king 8, mod king 8) board) False (zip [0..] (concat board))
+  where king = fst $ (filter (\(index, cell) -> cell == King {color = "W"}) $ zip [0..] (concat board)) !! 0
+
+-- inCheckMate :: [[Piece]] -> Bool
+
 
 format :: Piece -> String
 format (Empty {color = c})
@@ -178,6 +187,9 @@ format (King {color = c})
 play :: [[Piece]] -> IO ()
 play board = do
   putStr $ draw $ board
+  if inCheck board
+    then putStr "\nYou are in check!"
+    else putStr "Play wisely!"
   putStr "\n(r0, c0):"
   initial <- getLine
   putStr "(r1, c1):"
