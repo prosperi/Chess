@@ -31,9 +31,9 @@ Chess features an 8x8 board which players can move their pieces on. Any moves ou
 Starting Position
 -----------------
 All pieces must start on the board in a particular format.
-The top row of the board features from left to right a brook, knight, bishop, queen, king, bishop, knight, and a brook from the black team. The next row below features eight pawns from the black team.
+The top row of the board features from left to right a rook, knight, bishop, queen, king, bishop, knight, and a rook from the black team. The next row below features eight pawns from the black team.
 
-The second to bottom row features the eight pawns from the white team. This is followed by a row with a brook, knight, bishop, queen, king, bishop, knight, brook in left to right order.
+The second to bottom row features the eight pawns from the white team. This is followed by a row with a rook, knight, bishop, queen, king, bishop, knight, rook in left to right order.
 
 Here is a graphical representation of the starting board. The definitions of each of the pieces are provided below.
 
@@ -52,8 +52,8 @@ The night can move a combination of one and two spaces in the two cardinal direc
 Examples: up two right one, down one left two.
 The knight cannot move one right and one up or two right and two up. It must always feature a one space and a two space move in two cardinal directions. Any pieces in between the path of the movement do not matter. The only requirement is that your own piece is not present on the destination of the move. If an opponent's piece is present in the destination, then you kill it.
 
-Brook ♜:
-The brook can move either directly horizontally or directly vertically on the board. It can kill an opponent's piece if it is at its final destination. Any other pieces along the path invalidate the move.
+Rook ♜:
+The rook can move either directly horizontally or directly vertically on the board. It can kill an opponent's piece if it is at its final destination. Any other pieces along the path invalidate the move.
 
 King ♚:
 The king can move one space in any direction (horizontally, vertically, or diagonally). The only requirements are that a piece of the king's color is not in the way and that the king is not moving into a position which would put it into check. If the king moves into a spot occupied by an opponent's piece, that piece is killed.
